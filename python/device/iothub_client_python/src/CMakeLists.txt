@@ -31,7 +31,7 @@ target_link_libraries(
     iothub_client_http_transport
     iothub_client_amqp_transport
     iothub_client 
-    uamqp
+    ${UAMQP_LIBRARY_PATH}
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}
 )

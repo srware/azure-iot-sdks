@@ -134,7 +134,6 @@ if(${use_mqtt})
 endif()
 
 #these are the include folders
-#the following "set" statetement exports across the project a global variable called SHARED_UTIL_INC_FOLDER that expands to whatever needs to included when using COMMON library
 
 if(${use_http})
     set(IOTHUB_CLIENT_HTTP_TRANSPORT_INC_FOLDER ${CMAKE_CURRENT_LIST_DIR}/inc CACHE INTERNAL "this is what needs to be included if using iothub_client_http_transport lib" FORCE)
@@ -154,10 +153,10 @@ if(NOT ${dont_use_uploadtoblob})
     include_directories(../parson)
 endif()
 
-include_directories(${SHARED_UTIL_INC_FOLDER})
+include_directories(${SHARED_UTIL_INCLUDE_DIR})
 
 if (WINCE)
-include_directories(${SHARED_UTIL_INC_FOLDER}/azure_c_shared_utility/windowsce) #windowsce SDK doesn't have stdbool.h
+include_directories(${SHARED_UTIL_INCLUDE_DIR}/azure_c_shared_utility/windowsce) #windowsce SDK doesn't have stdbool.h
 ENDIF()
 
 
@@ -191,7 +190,7 @@ if(${use_http})
 endif()
 
 if(${use_amqp})
-    include_directories(${IOTHUB_CLIENT_AMQP_TRANSPORT_INC_FOLDER} ${UAMQP_INC_FOLDER})
+    include_directories(${IOTHUB_CLIENT_AMQP_TRANSPORT_INC_FOLDER} ${UAMQP_INCLUDE_DIR})
     add_library(iothub_client_amqp_transport 
         ${iothub_client_amqp_transport_c_files} 
         ${iothub_client_amqp_transport_h_files}
@@ -205,7 +204,7 @@ if(${use_amqp})
 endif()
 
 if(${use_mqtt})
-    include_directories(${IOTHUB_CLIENT_MQTT_TRANSPORT_INC_FOLDER} ${MQTT_INC_FOLDER})
+    include_directories(${IOTHUB_CLIENT_MQTT_TRANSPORT_INC_FOLDER} ${MQTT_INCLUDE_DIR})
     add_library(iothub_client_mqtt_transport 
         ${iothub_client_mqtt_transport_c_files} 
         ${iothub_client_mqtt_transport_h_files}
@@ -258,8 +257,8 @@ if(WIN32)
 else()
     install (TARGETS 
         ${iothub_client_libs} 
-        DESTINATION lib)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install (FILES 
         ${iothub_client_h_install_files} 
-        DESTINATION include/azureiot)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/azureiot)
 endif (WIN32)

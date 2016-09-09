@@ -91,14 +91,50 @@ if(NOT "${compileOption_CXX}" STREQUAL "OFF")
     set(CMAKE_CXX_FLAGS "${compileOption_CXX} ${CMAKE_CXX_FLAGS}")
 endif()
 
-add_subdirectory(azure-c-shared-utility)
-add_subdirectory(azure-uamqp-c)
-add_subdirectory(azure-umqtt-c)
+find_library (SHARED_UTIL_LIB_PATH NAMES aziotsharedutil)
+find_library (UAMQP_LIB_PATH NAMES uamqp)
+find_library (MQTT_LIB_PATH NAMES umqtt)
+
+# Check if shared utils library is already provided
+if (SHARED_UTIL_LIB_PATH AND SHARED_UTIL_INCLUDE_DIR)
+    set(SHARED_UTIL_FOUND 1)
+
+    # Disable unit tests
+    set(skip_unittests ON)
+endif()
+
+if (NOT SHARED_UTIL_FOUND)
+    add_subdirectory(azure-c-shared-utility)
+    set(SHARED_UTIL_LIB_PATH aziotsharedutil)
+    set(SHARED_UTIL_INCLUDE_DIR ${SHARED_UTIL_INC_FOLDER})
+endif()
+
+# Check if uAMQP library is already provided
+if (UAMQP_LIB_PATH AND UAMQP_INCLUDE_DIR)
+    set(UAMQP_FOUND 1)
+endif()
+
+if (NOT UAMQP_FOUND)
+    add_subdirectory(azure-uamqp-c)
+    set(UAMQP_LIB_PATH uamqp)
+    set(UAMQP_INCLUDE_DIR ${UAMQP_INC_FOLDER})
+endif()
+
+# Check if uMQTT library is already provided
+if (MQTT_LIB_PATH AND MQTT_INCLUDE_DIR)
+    set(MQTT_FOUND 1)
+endif()
+
+if (NOT MQTT_FOUND)
+    add_subdirectory(azure-umqtt-c)
+    set(MQTT_LIB_PATH uamqp)
+    set(MQTT_INCLUDE_DIR ${MQTT_INC_FOLDER})
+endif()
 
 enable_testing()
 
 
-include_directories(${SHARED_UTIL_INC_FOLDER}/azure_c_shared_utility)
+include_directories(${SHARED_UTIL_INCLUDE_DIR}/azure_c_shared_utility)
 
 #this project uses several other projects that are build not by these CMakeFiles
 #this project also targets several OSes
@@ -134,14 +170,14 @@ endif()
 message(STATUS "iothub architecture: ${ARCHITECTURE}")
 
 function(linkUAMQP whatExecutableIsBuilding)
-    include_directories(${UAMQP_INC_FOLDER})
+    include_directories(${UAMQP_INCLUDE_DIR})
     
     if(WIN32)
         #windows needs this define
         add_definitions(-D_CRT_SECURE_NO_WARNINGS)
         add_definitions(-DGB_MEASURE_MEMORY_FOR_THIS -DGB_DEBUG_ALLOC)
 
-        target_link_libraries(${whatExecutableIsBuilding} uamqp aziotsharedutil ws2_32 secur32)
+        target_link_libraries(${whatExecutableIsBuilding} ${UAMQP_LIB_PATH} ${SHARED_UTIL_LIB_PATH} ws2_32 secur32)
 
         if(${use_openssl} OR ${use_wsio})
             target_link_libraries(${whatExecutableIsBuilding} $ENV{OpenSSLDir}/lib/ssleay32.lib $ENV{OpenSSLDir}/lib/libeay32.lib)
@@ -150,7 +186,7 @@ function(linkUAMQP whatExecutableIsBuilding)
             file(COPY $ENV{OpenSSLDir}/bin/ssleay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
         endif()
     else()
-        target_link_libraries(${whatExecutableIsBuilding} uamqp aziotsharedutil ssl crypto)
+        target_link_libraries(${whatExecutableIsBuilding} ${UAMQP_LIB_PATH} ${SHARED_UTIL_LIB_PATH} ssl crypto)
     endif()
     
     if(${use_wsio})
@@ -159,12 +195,12 @@ function(linkUAMQP whatExecutableIsBuilding)
 endfunction(linkUAMQP)
 
 function(includeMqtt)
-    include_directories(${MQTT_INC_FOLDER})
+    include_directories(${MQTT_INCLUDE_DIR})
 endfunction(includeMqtt)
 
 function(linkMqttLibrary whatExecutableIsBuilding)
     includeMqtt()
-    target_link_libraries(${whatExecutableIsBuilding} umqtt)
+    target_link_libraries(${whatExecutableIsBuilding} ${MQTT_LIB_PATH})
 endfunction(linkMqttLibrary)
 
 function(includeHttp)
@@ -185,7 +221,7 @@ function(linkHttp whatExecutableIsBuilding)
 endfunction(linkHttp)
 
 function(linkSharedUtil whatIsBuilding)
-    target_link_libraries(${whatIsBuilding} aziotsharedutil)
+    target_link_libraries(${whatIsBuilding} ${SHARED_UTIL_LIB_PATH})
 endfunction(linkSharedUtil)
 
 macro(compileAsC99)

@@ -17,6 +17,6 @@ set(${theseTestsName}_c_files
 set(${theseTestsName}_h_files
 )
 
-include_directories(${SHARED_UTIL_INC_FOLDER})
+include_directories(${SHARED_UTIL_INCLUDE_DIR})
 
 build_test_artifacts(${theseTestsName} ON)

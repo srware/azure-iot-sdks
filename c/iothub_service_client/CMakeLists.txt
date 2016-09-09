@@ -33,9 +33,9 @@ if(MSVC)
 set_source_files_properties(../parson/parson.c PROPERTIES COMPILE_FLAGS "/wd4244 /wd4232")
 endif()
 
-include_directories(${SHARED_UTIL_INC_FOLDER})
+include_directories(${SHARED_UTIL_INCLUDE_DIR})
 
-include_directories(${UAMQP_INC_FOLDER})
+include_directories(${UAMQP_INCLUDE_DIR})
 
 set(IOTHUB_SERVICE_CLIENT_INC_FOLDER ${CMAKE_CURRENT_LIST_DIR}/inc CACHE INTERNAL "This is the include folder for iothub_service_client" FORCE)
 
@@ -50,7 +50,7 @@ ENDIF(WIN32)
 add_library(iothub_service_client ${iothub_service_client_c_files} ${iothub_service_client_h_files})
 
 if(NOT ${nuget_e2e_tests})
-    target_link_libraries(iothub_service_client uamqp)
+    target_link_libraries(iothub_service_client ${UAMQP_LIB_PATH})
 else()
     target_link_libraries(iothub_service_client)
 endif()

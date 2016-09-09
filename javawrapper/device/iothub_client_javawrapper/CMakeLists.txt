@@ -63,16 +63,16 @@ set(iothub_client_sample_h_files
     
 )
 
-include_directories(${SHARED_UTIL_INC_FOLDER})
+include_directories(${SHARED_UTIL_INCLUDE_DIR})
 include_directories(${IOTHUB_CLIENT_INC_FOLDER})
 if(${use_http})
     include_directories(${IOTHUB_CLIENT_HTTP_TRANSPORT_INC_FOLDER})
 endif()
 if(${use_amqp})
-    include_directories(${IOTHUB_CLIENT_AMQP_TRANSPORT_INC_FOLDER} ${UAMQP_INC_FOLDER})
+    include_directories(${IOTHUB_CLIENT_AMQP_TRANSPORT_INC_FOLDER} ${UAMQP_INCLUDE_DIR})
 endif()
 if(${use_mqtt})
-    include_directories(${IOTHUB_CLIENT_MQTT_TRANSPORT_INC_FOLDER} ${MQTT_INC_FOLDER})
+    include_directories(${IOTHUB_CLIENT_MQTT_TRANSPORT_INC_FOLDER} ${MQTT_INCLUDE_DIR})
 endif()
 
 include_directories(.)
